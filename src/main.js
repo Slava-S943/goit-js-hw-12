@@ -57,6 +57,11 @@ async function handleSubmit(e) {
 
     if (page * 15 < totalHits) {
       showLoadMoreButton();
+    } else {
+      iziToast.info({
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topRight',
+      });
     }
   } catch (error) {
     iziToast.error({
@@ -71,6 +76,7 @@ async function handleSubmit(e) {
 async function handleLoadMore() {
   page += 1;
 
+  hideLoadMoreButton();
   showLoader();
 
   try {
@@ -78,23 +84,22 @@ async function handleLoadMore() {
 
     createGallery(data.hits);
 
-    const card = document.querySelector('.gallery-item');
+    const { height } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
 
-    if (card) {
-      const height = card.getBoundingClientRect().height;
+    window.scrollBy({
+      top: height * 2,
+      behavior: 'smooth',
+    });
 
-      window.scrollBy({
-        top: height * 2,
-        behavior: 'smooth',
-      });
-    }
     if (page * 15 >= totalHits) {
-      hideLoadMoreButton();
-
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
         position: 'topRight',
       });
+    } else {
+      showLoadMoreButton();
     }
   } catch (error) {
     iziToast.error({
